@@ -51,7 +51,7 @@ The committed `out/claude/` is a real run through `--cli`.
 
 - **Before**: the 10 raw posts, as scraped.
 - **After**: 9 normalised records sorted by trust score, showing the resolved clinic, a price check, flags and the translation.
-- **Embeddings** (appears once `embed.py` has been run; not in the live page yet): every raw post embedded with a local multilingual model and projected to 2D. Dashed lines join posts that were merged as duplicates.
+- **Embeddings**: every raw post embedded with a local multilingual model and projected to 2D. Dashed lines join posts that were merged as duplicates.
   The table shows the *closest* pairs. Some are different people describing the same clinic and procedure. That's why the merge uses
   exact text overlap, and the map is only for exploring.
 
