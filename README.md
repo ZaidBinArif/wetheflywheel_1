@@ -35,11 +35,25 @@ raw_reviews.jsonl ──► 1. dedupe ──► 2. extract (Claude) ──► 3.
 
 ```bash
 pip install -r requirements.txt
-python normalise.py --offline   # no API key: dedupe + clinic text-scan + price regex
-python normalise.py             # full run: needs ANTHROPIC_API_KEY
+python normalise.py --cli       # full run through the Claude Code CLI (your Claude login, no API key)
+python normalise.py             # full run through the API: needs ANTHROPIC_API_KEY
+python normalise.py --offline   # no Claude at all: dedupe + clinic text-scan + price regex
+python embed.py                 # local multilingual embeddings for the map view
+python build_site.py            # bakes everything into docs/index.html (GitHub Pages)
 ```
 
 Output goes to `out/<mode>/reviews.json` (one record per unique review) and `out/<mode>/clinics.md` (a summary per clinic).
+The committed `out/claude/` is a real run through `--cli`.
+
+## The page
+
+`docs/index.html` is one static page with a switch at the top:
+
+- **Before**: the 10 raw posts, as scraped.
+- **After**: 9 normalised records sorted by trust score, showing the resolved clinic, a price check, flags and the translation.
+- **Embeddings** (appears once `embed.py` has been run; not in the live page yet): every raw post embedded with a local multilingual model and projected to 2D. Dashed lines join posts that were merged as duplicates.
+  The table shows the *closest* pairs. Some are different people describing the same clinic and procedure. That's why the merge uses
+  exact text overlap, and the map is only for exploring.
 
 ## What's next at real scale
 

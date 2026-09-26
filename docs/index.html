@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gangnam Review Normaliser</title>
+<meta name="description" content="Raw Korean clinic reviews in, de-duplicated structured English records out.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f6f3; --surface: #ffffff; --ink: #1c1b19; --muted: #6b6760; --line: #e6e3dc;
+  --accent: #b4235a; --accent-soft: #fbe8ef;
+  --good: #1f7a4d; --good-soft: #e3f3ea; --warn: #9a5b00; --warn-soft: #fbf0dc; --bad: #b42318; --bad-soft: #fde8e6;
+  --c-haneulbit: #b4235a; --c-dain: #2563a8; --c-seoul-miso: #1f7a4d; --c-none: #8a857c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141312; --surface: #1d1c1a; --ink: #eeebe6; --muted: #a29d94; --line: #33312d;
+    --accent: #f06f9e; --accent-soft: #3a1d29;
+    --good: #5cc98f; --good-soft: #17301f; --warn: #e8a94a; --warn-soft: #33260f; --bad: #f47a6e; --bad-soft: #3a1a17;
+    --c-haneulbit: #f06f9e; --c-dain: #6ea8f0; --c-seoul-miso: #5cc98f; --c-none: #8a857c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141312; --surface: #1d1c1a; --ink: #eeebe6; --muted: #a29d94; --line: #33312d;
+  --accent: #f06f9e; --accent-soft: #3a1d29;
+  --good: #5cc98f; --good-soft: #17301f; --warn: #e8a94a; --warn-soft: #33260f; --bad: #f47a6e; --bad-soft: #3a1a17;
+  --c-haneulbit: #f06f9e; --c-dain: #6ea8f0; --c-seoul-miso: #5cc98f; --c-none: #8a857c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, "Noto Sans KR", system-ui, sans-serif; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 64px; }
+header { padding-block: 40px 8px; text-align: center; }
+h1 { font-size: clamp(1.5rem, 3.5vw, 2.1rem); margin: 0 0 6px; letter-spacing: -0.02em; }
+.lede { color: var(--muted); margin: 0 auto; max-width: 620px; }
+.switch-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; justify-content: center; padding: 14px 0; background: var(--bg); }
+.switch { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 2px; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); }
+.switch button { border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600; font-size: 0.9rem; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; color: var(--muted); font-size: 0.88rem; margin: 4px 0 22px; }
+.stats b { color: var(--ink); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.card.dupe { border-style: dashed; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font-size: 0.76rem; font-weight: 500; color: var(--muted); }
+.tag.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.tag.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.tag.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.tag.accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.raw-text { font-family: "Noto Sans KR", Inter, sans-serif; font-size: 0.92rem; }
+.clinic { font-weight: 700; font-size: 1.02rem; display: flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.summary { margin: 0; }
+.row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.86rem; border-top: 1px solid var(--line); padding-top: 8px; }
+.row span:first-child { color: var(--muted); }
+.row span:last-child { text-align: right; }
+.trust { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; }
+details { font-size: 0.86rem; color: var(--muted); }
+details summary { cursor: pointer; }
+details p { margin: 6px 0 0; }
+.map-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.map-scroll { overflow-x: auto; }
+svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.84rem; color: var(--muted); margin-top: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tip { min-height: 4.5em; margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--bg); font-size: 0.88rem; }
+.pairs { margin-top: 16px; font-size: 0.86rem; }
+.pairs table { width: 100%; border-collapse: collapse; }
+.pairs td, .pairs th { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.pairs th { color: var(--muted); font-weight: 500; }
+.note { color: var(--muted); font-size: 0.86rem; max-width: 720px; margin: 14px auto 0; text-align: center; }
+footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 40px; }
+footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Gangnam Review Normaliser</h1>
+    <p class="lede">Korean clinic reviews from cafes, blogs and forums go in. One de-duplicated, translated, trust-scored record per real experience comes out.</p>
+  </header>
+
+  <div class="switch-bar">
+    <div class="switch" role="group" aria-label="View">
+      <button data-view="before" aria-pressed="true">Before</button>
+      <button data-view="after" aria-pressed="false">After</button>
+      <button data-view="map" aria-pressed="false">Embeddings</button>
+    </div>
+  </div>
+
+  <main>
+    <section id="before"></section>
+    <section id="after" hidden></section>
+    <section id="map" hidden></section>
+  </main>
+
+  <footer>Synthetic sample data; all clinic and surgeon names are fictional. <a href="https://github.com/ZaidBinArif/wetheflywheel_1">Source on GitHub</a></footer>
+</div>
+
+<script>
+const DATA = {"raw": [{"id": "r01", "source": "naver_cafe", "posted_at": "2026-03-02", "text": "강남 하늘빛성형외과에서 김도윤 원장님께 쌍커풀 절개랑 눈매교정 같이 했어요. 가격은 부가세 포함 280만원이었고 상담실장님이 처음에 320 불렀는데 카드 말고 현금으로 하니까 깎아주셨어요. 붓기는 2주 정도 갔고 지금 3개월차인데 라인 자연스럽게 잘 나왔어요. 전후 사진 첨부합니다. 영수증도 인증했어요."}, {"id": "r02", "source": "naver_blog", "posted_at": "2026-03-05", "text": "[내돈내산 / 광고 아님] 강남 하늘빛성형외과에서 김도윤 원장님께 쌍커풀 절개랑 눈매교정 같이 했어요. 가격은 부가세 포함 280만원이었고 상담실장님이 처음에 320 불렀는데 현금으로 하니까 깎아주셨어요. 붓기는 2주 정도 갔고 지금 3개월차인데 라인 자연스럽게 잘 나왔어요. 전후 사진 첨부합니다!"}, {"id": "r03", "source": "naver_blog", "posted_at": "2026-03-11", "text": "안녕하세요~ 오늘은 HB성형외과 코성형 후기 들고 왔어요 ✨ 원장님이 너무 친절하시고 시설도 호텔같이 깔끔해요! 실리콘 + 귀연골로 했고 결과 대만족입니다. 궁금하신 분들은 댓글 남겨주세요~ 본 포스팅은 병원으로부터 시술비를 지원받아 작성되었습니다."}, {"id": "r04", "source": "daum_cafe", "posted_at": "2026-02-18", "text": "다인성형외과에서 작년에 광대축소랑 사각턱 했는데 턱 비대칭이 생겨서 결국 재수술 상담 받는 중입니다. 수술비는 1,350만원 냈고요. 원장 이름은 굳이 안 쓸게요. 신경 손상으로 아랫입술 감각이 아직 반쯤 없어요. 병원 측은 시간이 지나면 돌아온다고만 하네요."}, {"id": "r05", "source": "english_forum", "posted_at": "2026-03-20", "text": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM."}, {"id": "r06", "source": "naver_cafe", "posted_at": "2026-01-29", "text": "서울미소의원에서 레이저토닝 10회 패키지 49만원에 끊었어요. 기미가 확실히 옅어졌는데 5회차부터 효과 보였어요. 원장님은 매번 바뀌어서 누군지 모르겠어요. 부작용은 없었어요."}, {"id": "r07", "source": "daum_cafe", "posted_at": "2026-02-07", "text": "미소의원 사각턱 보톡스 국산으로 5만원 이벤트 했어요 ㅋㅋ 싸서 반신반의했는데 한 달 지나니까 턱라인 정리됐어요. 대기가 1시간 넘게 걸린 건 별로."}, {"id": "r08", "source": "naver_cafe", "posted_at": "2026-03-14", "text": "압구정 새벽별의원에서 울쎄라 300샷 했는데 가격이 150만원... 효과는 솔직히 잘 모르겠어요. 아프기만 엄청 아팠음."}, {"id": "r09", "source": "english_forum", "posted_at": "2026-03-25", "text": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end."}, {"id": "r10", "source": "naver_cafe", "posted_at": "2026-03-08", "text": "하늘빛성형에서 쌍커풀 매몰로 했어요. 김도윤 원장님 상담 꼼꼼하시고 가격은 150만원. 1주일 만에 붓기 거의 빠졌어요. 전후사진은 개인 소장이라 못 올려요 ㅠ"}], "records": [{"id": "r06", "sources": [{"id": "r06", "source": "naver_cafe", "posted_at": "2026-01-29"}], "clinic": {"id": "seoul-miso", "name_en": "Seoul Miso Clinic", "mention": "서울미소의원", "match": "exact"}, "surgeon_mention": null, "review_type": "procedure", "procedures": ["laser_toning"], "price": {"krw": 490000, "verbatim": "49만원", "note": "Package price for 10 laser toning sessions; no VAT or discount details given.", "check": "verified"}, "outcome": "positive", "complications": [], "revision_needed": false, "summary_en": "Author bought a 10-session laser toning package for 490,000 KRW at 서울미소의원, reporting clear melasma fading from the 5th session onward and no side effects, though a different doctor treated them each visit.", "translation_en": "I signed up for a 10-session laser toning package at Seoul Miso Clinic for 490,000 won. My melasma definitely faded, but I only started seeing results from the 5th session. The doctor was different every time, so I don't know who it was. There were no side effects.", "trust": {"score": 60, "signals": ["first_person", "price_verified"]}, "original_text": "서울미소의원에서 레이저토닝 10회 패키지 49만원에 끊었어요. 기미가 확실히 옅어졌는데 5회차부터 효과 보였어요. 원장님은 매번 바뀌어서 누군지 모르겠어요. 부작용은 없었어요."}, {"id": "r07", "sources": [{"id": "r07", "source": "daum_cafe", "posted_at": "2026-02-07"}], "clinic": {"id": "seoul-miso", "name_en": "Seoul Miso Clinic", "mention": "미소의원", "match": "exact"}, "surgeon_mention": null, "review_type": "procedure", "procedures": ["botox"], "price": {"krw": 50000, "verbatim": "5만원", "note": "Event price for domestic (국산) botox product; author noted it was cheap enough to make them skeptical. No mention of VAT.", "check": "verified"}, "outcome": "mixed", "complications": [], "revision_needed": false, "summary_en": "Author received domestic-brand jaw botox at 미소의원 for 50,000 won through an event and saw jawline slimming after one month, but complained about a wait of over an hour.", "translation_en": "Miso Clinic ran an event for square-jaw botox with a domestic product for 50,000 won haha. It was cheap so I was half in doubt, but after a month passed my jaw line got cleaned up. Having to wait more than an hour was a downside.", "trust": {"score": 60, "signals": ["first_person", "price_verified"]}, "original_text": "미소의원 사각턱 보톡스 국산으로 5만원 이벤트 했어요 ㅋㅋ 싸서 반신반의했는데 한 달 지나니까 턱라인 정리됐어요. 대기가 1시간 넘게 걸린 건 별로."}, {"id": "r04", "sources": [{"id": "r04", "source": "daum_cafe", "posted_at": "2026-02-18"}], "clinic": {"id": "dain", "name_en": "Dain Plastic Surgery", "mention": "다인성형외과", "match": "exact"}, "surgeon_mention": null, "review_type": "procedure", "procedures": ["zygoma_reduction", "jaw_reduction"], "price": {"krw": 13500000, "verbatim": "1,350만원", "note": null, "check": "verified"}, "outcome": "negative", "complications": ["jaw asymmetry", "nerve damage", "partial numbness of lower lip (still about half numb)"], "revision_needed": true, "summary_en": "Author reports zygoma reduction and jaw reduction at 다인성형외과 last year costing 13,500,000 KRW, resulting in jaw asymmetry and persistent partial numbness of the lower lip from nerve damage, and is now consulting about revision surgery.", "translation_en": "I had zygoma reduction and square jaw surgery at 다인성형외과 last year, but I developed jaw asymmetry, so I'm currently getting consultations for revision surgery. I paid 13,500,000 KRW for the surgery. I'm not going to bother writing the director's name. Due to nerve damage, my lower lip is still about half numb. The clinic only tells me it will come back with time.", "trust": {"score": 60, "signals": ["first_person", "price_verified"]}, "original_text": "다인성형외과에서 작년에 광대축소랑 사각턱 했는데 턱 비대칭이 생겨서 결국 재수술 상담 받는 중입니다. 수술비는 1,350만원 냈고요. 원장 이름은 굳이 안 쓸게요. 신경 손상으로 아랫입술 감각이 아직 반쯤 없어요. 병원 측은 시간이 지나면 돌아온다고만 하네요."}, {"id": "r01", "sources": [{"id": "r01", "source": "naver_cafe", "posted_at": "2026-03-02"}, {"id": "r02", "source": "naver_blog", "posted_at": "2026-03-05"}], "clinic": {"id": "haneulbit", "name_en": "Haneulbit Plastic Surgery", "mention": "하늘빛성형외과", "match": "exact"}, "surgeon_mention": "김도윤", "review_type": "procedure", "procedures": ["double_eyelid_incisional", "ptosis_correction"], "price": {"krw": 2800000, "verbatim": "부가세 포함 280만원", "note": "VAT included. Initially quoted 320만원 (3,200,000 KRW) by the consultation manager; discounted for paying cash instead of card.", "check": "verified"}, "outcome": "positive", "complications": ["swelling lasting about 2 weeks"], "revision_needed": false, "summary_en": "First-person review of incisional double eyelid surgery with ptosis correction, paid 2,800,000 KRW including VAT after a cash discount from an initial 3.2 million quote, with about 2 weeks of swelling and a natural result at 3 months.", "translation_en": "I had incisional double eyelid surgery together with ptosis correction (eye-shape correction) with Dr. Kim Do-yun at Haneulbit Plastic Surgery in Gangnam. The price was 2.8 million won including VAT — the consultation manager first quoted 3.2 million, but since I paid in cash instead of by card, they gave me a discount. The swelling lasted about 2 weeks, and I'm now 3 months post-op and the line came out nicely and naturally. Attaching before-and-after photos. I also verified/posted the receipt.", "trust": {"score": 100, "signals": ["first_person", "proof", "surgeon_named", "price_verified", "cross_posted"]}, "original_text": "강남 하늘빛성형외과에서 김도윤 원장님께 쌍커풀 절개랑 눈매교정 같이 했어요. 가격은 부가세 포함 280만원이었고 상담실장님이 처음에 320 불렀는데 카드 말고 현금으로 하니까 깎아주셨어요. 붓기는 2주 정도 갔고 지금 3개월차인데 라인 자연스럽게 잘 나왔어요. 전후 사진 첨부합니다. 영수증도 인증했어요."}, {"id": "r10", "sources": [{"id": "r10", "source": "naver_cafe", "posted_at": "2026-03-08"}], "clinic": {"id": "haneulbit", "name_en": "Haneulbit Plastic Surgery", "mention": "하늘빛성형", "match": "exact"}, "surgeon_mention": "김도윤 원장님", "review_type": "procedure", "procedures": ["double_eyelid_non_incisional"], "price": {"krw": 1500000, "verbatim": "150만원", "note": null, "check": "verified"}, "outcome": "positive", "complications": [], "revision_needed": false, "summary_en": "First-person account of non-incisional double eyelid surgery at 하늘빛성형 with 김도윤 원장님 for 1,500,000 KRW, with swelling largely resolved after one week and no photos shared.", "translation_en": "I had non-incisional (buried suture) double eyelid surgery at Haneulbit Seonghyeong (하늘빛성형). Director Kim Do-yoon's consultation was thorough and the price was 1.5 million won. The swelling had mostly gone down within a week. I can't post before/after photos because they're for my own personal keeping, sad.", "trust": {"score": 75, "signals": ["first_person", "surgeon_named", "price_verified"]}, "original_text": "하늘빛성형에서 쌍커풀 매몰로 했어요. 김도윤 원장님 상담 꼼꼼하시고 가격은 150만원. 1주일 만에 붓기 거의 빠졌어요. 전후사진은 개인 소장이라 못 올려요 ㅠ"}, {"id": "r03", "sources": [{"id": "r03", "source": "naver_blog", "posted_at": "2026-03-11"}], "clinic": {"id": "haneulbit", "name_en": "Haneulbit Plastic Surgery", "mention": "HB성형외과", "match": "exact"}, "surgeon_mention": null, "review_type": "procedure", "procedures": ["rhinoplasty"], "price": {"krw": null, "verbatim": null, "note": null, "check": "none"}, "outcome": "positive", "complications": [], "revision_needed": false, "summary_en": "A sponsored blog post about a rhinoplasty using silicone and ear cartilage at HB성형외과, reporting full satisfaction with no price or downsides given.", "translation_en": "Hello~ Today I've brought a review of rhinoplasty at HB Plastic Surgery ✨ The director is so kind and the facilities are as clean as a hotel! I had it done with silicone + ear cartilage and I'm very satisfied with the result. If anyone is curious, please leave a comment~ This posting was written with the procedure cost supported by the clinic.", "trust": {"score": 0, "signals": ["first_person", "sponsored", "marketing_tone"]}, "original_text": "안녕하세요~ 오늘은 HB성형외과 코성형 후기 들고 왔어요 ✨ 원장님이 너무 친절하시고 시설도 호텔같이 깔끔해요! 실리콘 + 귀연골로 했고 결과 대만족입니다. 궁금하신 분들은 댓글 남겨주세요~ 본 포스팅은 병원으로부터 시술비를 지원받아 작성되었습니다."}, {"id": "r08", "sources": [{"id": "r08", "source": "naver_cafe", "posted_at": "2026-03-14"}], "clinic": {"id": null, "name_en": null, "mention": "압구정 새벽별의원", "match": "unmatched"}, "surgeon_mention": null, "review_type": "procedure", "procedures": ["ulthera"], "price": {"krw": 1500000, "verbatim": "150만원", "note": "Price stated for 300 shots; no mention of VAT, discounts, or earlier quotes.", "check": "verified"}, "outcome": "negative", "complications": ["severe pain during the procedure"], "revision_needed": false, "summary_en": "Author paid 1,500,000 KRW for a 300-shot Ulthera treatment at 압구정 새벽별의원 and reports no discernible effect and considerable pain.", "translation_en": "I got Ulthera, 300 shots, at Apgujeong Saebyeokbyeol Clinic and the price was 1.5 million won... Honestly, I can't really tell if it did anything. It just hurt like crazy.", "trust": {"score": 60, "signals": ["first_person", "price_verified"]}, "original_text": "압구정 새벽별의원에서 울쎄라 300샷 했는데 가격이 150만원... 효과는 솔직히 잘 모르겠어요. 아프기만 엄청 아팠음."}, {"id": "r05", "sources": [{"id": "r05", "source": "english_forum", "posted_at": "2026-03-20"}], "clinic": {"id": "dain", "name_en": "Dain Plastic Surgery", "mention": "Dain PS (Da-in)", "match": "exact"}, "surgeon_mention": "Dr. Park Seo-jin", "review_type": "procedure", "procedures": ["rhinoplasty"], "price": {"krw": 9800000, "verbatim": "9,800,000 won", "note": "Author gives a USD equivalent of \"about $7,100 at the time\". No mention of VAT, discounts or packages.", "check": "verified"}, "outcome": "positive", "complications": ["residual swelling still present at 3 weeks post-op"], "revision_needed": false, "summary_en": "An English-speaking medical tourist reports paying 9,800,000 KRW for a rhinoplasty by Dr. Park Seo-jin at Dain PS, noting residual swelling at three weeks but a good result and helpful English coordination.", "translation_en": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM.", "trust": {"score": 95, "signals": ["first_person", "proof", "surgeon_named", "price_verified"]}, "original_text": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM."}, {"id": "r09", "sources": [{"id": "r09", "source": "english_forum", "posted_at": "2026-03-25"}], "clinic": {"id": "haneulbit", "name_en": "Haneulbit Plastic Surgery", "mention": "Haneulbit Plastic Surgery", "match": "exact"}, "surgeon_mention": null, "review_type": "consultation_only", "procedures": ["fat_grafting", "eye_revision"], "price": {"krw": 12000000, "verbatim": "12 million KRW", "note": "Quote only, for fat grafting plus eye revision combined; author did not proceed. No VAT or discount details given.", "check": "verified"}, "outcome": "negative", "complications": [], "revision_needed": false, "summary_en": "The author was quoted 12,000,000 KRW at Haneulbit Plastic Surgery for fat grafting and an eye revision, spent only 10 minutes with the surgeon versus 40 with a sales coordinator, and did not book the surgery.", "translation_en": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end.", "trust": {"score": 60, "signals": ["first_person", "price_verified"]}, "original_text": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end."}], "clinics": {"haneulbit": {"id": "haneulbit", "name_ko": "하늘빛성형외과", "name_en": "Haneulbit Plastic Surgery", "aliases": ["하늘빛", "하늘빛성형", "HB성형외과", "Haneulbit", "Haneul-bit PS"]}, "dain": {"id": "dain", "name_ko": "다인성형외과", "name_en": "Dain Plastic Surgery", "aliases": ["다인", "다인성형", "Dain PS", "Da-in", "DAIN"]}, "seoul-miso": {"id": "seoul-miso", "name_ko": "서울미소의원", "name_en": "Seoul Miso Clinic", "aliases": ["서울미소", "미소의원", "Miso Clinic"]}}, "embeddings": null};
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const krw = n => n == null ? "—" : "₩" + n.toLocaleString("en-US");
+const SOURCE = { naver_cafe: "Naver Cafe", naver_blog: "Naver Blog", daum_cafe: "Daum Cafe", english_forum: "English forum" };
+const clinicColor = id => `var(--c-${id || "none"})`;
+const clinicName = id => DATA.clinics[id]?.name_en || "Unmatched clinic";
+
+// raw id -> the normalised record it ended up in
+const recordOf = {};
+DATA.records.forEach(r => r.sources.forEach(s => (recordOf[s.id] = r)));
+
+function renderBefore() {
+  const sources = new Set(DATA.raw.map(r => r.source));
+  const el = document.getElementById("before");
+  el.innerHTML = `
+    <div class="stats"><span><b>${DATA.raw.length}</b> posts</span><span><b>${sources.size}</b> sources</span><span>Mostly Korean, prices in 만원, clinic names spelled many ways</span></div>
+    <div class="grid">${DATA.raw.map(r => `
+      <article class="card">
+        <div class="meta"><span class="tag">${SOURCE[r.source] || r.source}</span><span>${r.posted_at}</span><span>#${r.id}</span></div>
+        <div class="raw-text">${esc(r.text)}</div>
+      </article>`).join("")}
+    </div>`;
+}
+
+function trustColor(score) { return score >= 60 ? "var(--good)" : score >= 35 ? "var(--warn)" : "var(--bad)"; }
+const OUTCOME = { positive: "good", mixed: "warn", negative: "bad", unknown: "" };
+const PRICE_CHECK = { verified: ["good", "price verified"], mismatch: ["bad", "price mismatch"], unverified: ["warn", "price unverified"] };
+
+function renderAfter() {
+  const recs = [...DATA.records].sort((a, b) => b.trust.score - a.trust.score);
+  const merged = DATA.raw.length - DATA.records.length;
+  const unmatched = recs.filter(r => !r.clinic.id).length;
+  const sponsored = recs.filter(r => r.trust.signals.includes("sponsored")).length;
+  const el = document.getElementById("after");
+  el.innerHTML = `
+    <div class="stats"><span><b>${recs.length}</b> unique reviews</span><span><b>${merged}</b> duplicate merged</span><span><b>${Object.keys(DATA.clinics).length}</b> clinics resolved</span><span><b>${unmatched}</b> needs review</span><span><b>${sponsored}</b> sponsored flagged</span></div>
+    <div class="grid">${recs.map(r => {
+      const pc = PRICE_CHECK[r.price.check];
+      return `
+      <article class="card">
+        <div class="clinic"><span class="dot" style="background:${clinicColor(r.clinic.id)}"></span>${esc(clinicName(r.clinic.id))}</div>
+        <div class="meta">
+          ${r.clinic.mention ? `<span>written as “${esc(r.clinic.mention)}” · ${esc(r.clinic.match)}</span>` : ""}
+        </div>
+        <div class="meta">
+          ${r.review_type === "consultation_only" ? `<span class="tag warn">quote only</span>` : ""}
+          ${r.outcome ? `<span class="tag ${OUTCOME[r.outcome]}">${r.outcome}</span>` : ""}
+          ${r.trust.signals.includes("sponsored") ? `<span class="tag bad">sponsored</span>` : ""}
+          ${r.trust.signals.includes("marketing_tone") ? `<span class="tag bad">marketing tone</span>` : ""}
+          ${r.revision_needed ? `<span class="tag bad">revision needed</span>` : ""}
+          ${r.sources.length > 1 ? `<span class="tag accent">merged ${r.sources.length} posts</span>` : ""}
+        </div>
+        <p class="summary">${esc(r.summary_en)}</p>
+        <div class="row"><span>Procedures</span><span>${r.procedures.map(p => p.replaceAll("_", " ")).join(", ") || "—"}</span></div>
+        <div class="row"><span>Surgeon</span><span>${esc(r.surgeon_mention) || "not named"}</span></div>
+        <div class="row"><span>Price</span><span>${krw(r.price.krw)} ${pc ? `<span class="tag ${pc[0]}">${pc[1]}</span>` : ""}</span></div>
+        ${r.price.note ? `<div class="row"><span>Price note</span><span>${esc(r.price.note)}</span></div>` : ""}
+        ${r.complications.length ? `<div class="row"><span>Complications</span><span>${r.complications.map(esc).join("; ")}</span></div>` : ""}
+        <div class="row"><span>Sources</span><span>${r.sources.map(s => `${SOURCE[s.source] || s.source} #${s.id}`).join(" + ")}</span></div>
+        <div class="trust"><span>Trust</span><div class="bar"><i style="width:${r.trust.score}%;background:${trustColor(r.trust.score)}"></i></div><b>${r.trust.score}</b></div>
+        <details><summary>English translation</summary><p>${esc(r.translation_en)}</p></details>
+      </article>`;
+    }).join("")}
+    </div>`;
+}
+
+function renderMap() {
+  const el = document.getElementById("map");
+  const pts = DATA.embeddings.points;
+  const W = 760, H = 460, P = 48;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const sx = v => P + (v - Math.min(...xs)) / (Math.max(...xs) - Math.min(...xs)) * (W - 2 * P);
+  const sy = v => H - P - (v - Math.min(...ys)) / (Math.max(...ys) - Math.min(...ys)) * (H - 2 * P);
+  const pos = Object.fromEntries(pts.map(p => [p.id, [sx(p.x), sy(p.y)]]));
+  const raw = Object.fromEntries(DATA.raw.map(r => [r.id, r]));
+
+  const dupeLines = DATA.records.filter(r => r.sources.length > 1).flatMap(r =>
+    r.sources.slice(1).map(s => [r.sources[0].id, s.id]));
+
+  el.innerHTML = `
+    <div class="stats"><span><b>${pts.length}</b> raw posts embedded</span><span>Model: <b>${esc(DATA.embeddings.model)}</b> (multilingual, runs locally)</span><span>2D by PCA</span></div>
+    <div class="map-card">
+      <div class="map-scroll">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="2D map of review embeddings">
+        ${dupeLines.map(([a, b]) => `<line x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>`).join("")}
+        ${pts.map(p => {
+          const rec = recordOf[p.id];
+          const [x, y] = pos[p.id];
+          return `<g class="pt" data-id="${p.id}" tabindex="0" style="cursor:pointer">
+            <circle cx="${x}" cy="${y}" r="11" fill="${clinicColor(rec?.clinic.id)}" fill-opacity="0.85" stroke="var(--surface)" stroke-width="2"/>
+            <text x="${x + 15}" y="${y + 4}" font-size="12" fill="var(--ink)">${p.id}</text>
+          </g>`;
+        }).join("")}
+      </svg>
+      </div>
+      <div class="legend">
+        ${Object.keys(DATA.clinics).map(id => `<span><i class="dot" style="background:${clinicColor(id)}"></i>${esc(clinicName(id))}</span>`).join("")}
+        <span><i class="dot" style="background:var(--c-none)"></i>Unmatched</span>
+        <span><svg width="26" height="8" style="min-width:0"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/></svg>Merged as duplicate</span>
+      </div>
+      <div class="tip" id="tip">Hover or tap a point to read the post.</div>
+    </div>
+    <div class="pairs map-card" style="margin-top:14px">
+      <b>Closest pairs by cosine similarity</b>
+      <table><thead><tr><th>Pair</th><th>Cosine</th><th>Same record after dedupe?</th></tr></thead><tbody>
+      ${DATA.embeddings.pairs.slice(0, 6).map(p => {
+        const same = recordOf[p.a] === recordOf[p.b];
+        return `<tr><td>#${p.a} · #${p.b}</td><td>${p.cosine.toFixed(3)}</td><td>${same ? '<span class="tag accent">yes, duplicate</span>' : '<span class="tag">no, different people</span>'}</td></tr>`;
+      }).join("")}
+      </tbody></table>
+    </div>
+    <p class="note">Embeddings put posts about the same clinic and procedure near each other, which includes different people with similar experiences. That's why the actual merge uses exact text overlap and the map is only for exploring.</p>`;
+
+  const tip = el.querySelector("#tip");
+  el.querySelectorAll(".pt").forEach(g => {
+    const show = () => {
+      const r = raw[g.dataset.id], rec = recordOf[g.dataset.id];
+      tip.innerHTML = `<b>#${r.id}</b> · ${SOURCE[r.source] || r.source} · ${esc(clinicName(rec?.clinic.id))}<br><span class="raw-text">${esc(r.text)}</span>`;
+    };
+    g.addEventListener("mouseenter", show);
+    g.addEventListener("focus", show);
+    g.addEventListener("click", show);
+  });
+}
+
+renderBefore(); renderAfter();
+if (DATA.embeddings) renderMap();
+else document.querySelector('[data-view="map"]').hidden = true;
+
+const buttons = document.querySelectorAll(".switch button");
+function setView(view) {
+  buttons.forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
+  ["before", "after", "map"].forEach(v => (document.getElementById(v).hidden = v !== view));
+  history.replaceState(null, "", "#" + view);
+}
+buttons.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+if (["before", "after", "map"].includes(location.hash.slice(1))) setView(location.hash.slice(1));
+</script>
+</body>
+</html>

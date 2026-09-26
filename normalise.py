@@ -9,6 +9,7 @@ Pipeline (only step 2 calls an LLM; everything that decides something is plain c
 
 Usage:
   python normalise.py              # full run, needs ANTHROPIC_API_KEY
+  python normalise.py --cli        # full run through the Claude Code CLI, no API key
   python normalise.py --offline    # steps 1, 3, 4, 5 only - no API calls
 """
 
@@ -127,6 +128,56 @@ def extract(client, review: dict, model: str) -> Extraction:
     if response.stop_reason == "refusal" or response.parsed_output is None:
         raise anthropic.AnthropicError(f"no structured output (stop_reason={response.stop_reason})")
     return response.parsed_output
+
+
+def cli_schema(model: type[BaseModel]) -> dict:
+    """Self-contained strict schema for --json-schema: inline Pydantic's $ref/$defs,
+    drop titles, and forbid extra keys on every object."""
+    schema = model.model_json_schema()
+    defs = schema.pop("$defs", {})
+
+    def fix(node):
+        if isinstance(node, dict):
+            if "$ref" in node:
+                return fix(defs[node["$ref"].split("/")[-1]])
+            node = {k: fix(v) for k, v in node.items() if k != "title"}
+            if node.get("type") == "object":
+                node["additionalProperties"] = False
+                node["required"] = list(node.get("properties", {}))
+            return node
+        if isinstance(node, list):
+            return [fix(v) for v in node]
+        return node
+
+    return fix(schema)
+
+
+def extract_via_cli(review: dict, model: str) -> Extraction:
+    """Same extraction, but through the Claude Code CLI (`claude -p`) - uses your Claude login, no API key."""
+    import shutil
+    import subprocess
+    import tempfile
+
+    # On Windows `claude` is a .CMD shim, and cmd.exe cuts arguments at newlines - which silently
+    # dropped everything after the multi-line prompt, including --json-schema. Pass the prompt as a file.
+    prompt_file = Path(tempfile.gettempdir()) / "gbg_system_prompt.txt"
+    prompt_file.write_text(SYSTEM_PROMPT, encoding="utf-8")
+    cmd = [
+        shutil.which("claude") or "claude", "-p",
+        "--model", model,
+        "--output-format", "json",
+        "--tools", "",
+        "--no-session-persistence",
+        "--append-system-prompt-file", str(prompt_file),
+        "--json-schema", json.dumps(cli_schema(Extraction)),
+    ]
+    prompt = f"Source: {review['source']}\nPosted: {review['posted_at']}\n\n<review>\n{review['text']}\n</review>"
+    proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True, encoding="utf-8",
+                          cwd=tempfile.gettempdir(), timeout=300)  # neutral cwd: no project context leaks in
+    result = json.loads(proc.stdout)
+    if result.get("is_error") or not result.get("structured_output"):
+        raise RuntimeError(result.get("result") or proc.stderr[:300])
+    return Extraction.model_validate(result["structured_output"])
 
 # ---------------------------------------------------------------------------
 # 3. Resolve clinic
@@ -316,6 +367,7 @@ def clinic_report(records: list[dict], registry: ClinicRegistry) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--offline", action="store_true", help="skip the Claude extraction step")
+    parser.add_argument("--cli", action="store_true", help="extract via the `claude -p` CLI instead of the API")
     parser.add_argument("--model", default=MODEL)
     parser.add_argument("--input", type=Path, default=ROOT / "data" / "raw_reviews.jsonl")
     parser.add_argument("--out", type=Path, default=None)
@@ -330,19 +382,28 @@ def main() -> None:
     groups = dedupe(reviews)
     print(f"{len(reviews)} raw reviews -> {len(groups)} unique (dedupe runs before any API call)")
 
-    client = None
-    if not args.offline:
+    if args.offline:
+        run = None
+    elif args.cli:
+        run = lambda review: extract_via_cli(review, args.model)
+    else:
         import anthropic
         client = anthropic.Anthropic()
+        run = lambda review: extract(client, review, args.model)
+
+    def safe_run(review):
+        try:
+            return run(review) if run else None
+        except Exception as e:  # keep going; one bad review shouldn't sink the batch
+            print(f"  {review['id']}: extraction failed - {e}")
+            return None
+
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        extractions = list(pool.map(safe_run, [g[0] for g in groups]))
 
     records = []
-    for group in groups:
-        ex = None
-        if client:
-            try:
-                ex = extract(client, group[0], args.model)
-            except Exception as e:  # keep going; one bad review shouldn't sink the batch
-                print(f"  {group[0]['id']}: extraction failed - {e}")
+    for group, ex in zip(groups, extractions):
         rec = build_record(group, ex, registry)
         records.append(rec)
         print(f"  {rec['id']}: clinic={rec['clinic']['id'] or '?':<11} ({rec['clinic']['match']}) "

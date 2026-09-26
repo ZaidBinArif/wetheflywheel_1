@@ -1,0 +1,387 @@
+[
+  {
+    "id": "r06",
+    "sources": [
+      {
+        "id": "r06",
+        "source": "naver_cafe",
+        "posted_at": "2026-01-29"
+      }
+    ],
+    "clinic": {
+      "id": "seoul-miso",
+      "name_en": "Seoul Miso Clinic",
+      "mention": "서울미소의원",
+      "match": "exact"
+    },
+    "surgeon_mention": null,
+    "review_type": "procedure",
+    "procedures": [
+      "laser_toning"
+    ],
+    "price": {
+      "krw": 490000,
+      "verbatim": "49만원",
+      "note": "Package price for 10 laser toning sessions; no VAT or discount details given.",
+      "check": "verified"
+    },
+    "outcome": "positive",
+    "complications": [],
+    "revision_needed": false,
+    "summary_en": "Author bought a 10-session laser toning package for 490,000 KRW at 서울미소의원, reporting clear melasma fading from the 5th session onward and no side effects, though a different doctor treated them each visit.",
+    "translation_en": "I signed up for a 10-session laser toning package at Seoul Miso Clinic for 490,000 won. My melasma definitely faded, but I only started seeing results from the 5th session. The doctor was different every time, so I don't know who it was. There were no side effects.",
+    "trust": {
+      "score": 60,
+      "signals": [
+        "first_person",
+        "price_verified"
+      ]
+    },
+    "original_text": "서울미소의원에서 레이저토닝 10회 패키지 49만원에 끊었어요. 기미가 확실히 옅어졌는데 5회차부터 효과 보였어요. 원장님은 매번 바뀌어서 누군지 모르겠어요. 부작용은 없었어요."
+  },
+  {
+    "id": "r07",
+    "sources": [
+      {
+        "id": "r07",
+        "source": "daum_cafe",
+        "posted_at": "2026-02-07"
+      }
+    ],
+    "clinic": {
+      "id": "seoul-miso",
+      "name_en": "Seoul Miso Clinic",
+      "mention": "미소의원",
+      "match": "exact"
+    },
+    "surgeon_mention": null,
+    "review_type": "procedure",
+    "procedures": [
+      "botox"
+    ],
+    "price": {
+      "krw": 50000,
+      "verbatim": "5만원",
+      "note": "Event price for domestic (국산) botox product; author noted it was cheap enough to make them skeptical. No mention of VAT.",
+      "check": "verified"
+    },
+    "outcome": "mixed",
+    "complications": [],
+    "revision_needed": false,
+    "summary_en": "Author received domestic-brand jaw botox at 미소의원 for 50,000 won through an event and saw jawline slimming after one month, but complained about a wait of over an hour.",
+    "translation_en": "Miso Clinic ran an event for square-jaw botox with a domestic product for 50,000 won haha. It was cheap so I was half in doubt, but after a month passed my jaw line got cleaned up. Having to wait more than an hour was a downside.",
+    "trust": {
+      "score": 60,
+      "signals": [
+        "first_person",
+        "price_verified"
+      ]
+    },
+    "original_text": "미소의원 사각턱 보톡스 국산으로 5만원 이벤트 했어요 ㅋㅋ 싸서 반신반의했는데 한 달 지나니까 턱라인 정리됐어요. 대기가 1시간 넘게 걸린 건 별로."
+  },
+  {
+    "id": "r04",
+    "sources": [
+      {
+        "id": "r04",
+        "source": "daum_cafe",
+        "posted_at": "2026-02-18"
+      }
+    ],
+    "clinic": {
+      "id": "dain",
+      "name_en": "Dain Plastic Surgery",
+      "mention": "다인성형외과",
+      "match": "exact"
+    },
+    "surgeon_mention": null,
+    "review_type": "procedure",
+    "procedures": [
+      "zygoma_reduction",
+      "jaw_reduction"
+    ],
+    "price": {
+      "krw": 13500000,
+      "verbatim": "1,350만원",
+      "note": null,
+      "check": "verified"
+    },
+    "outcome": "negative",
+    "complications": [
+      "jaw asymmetry",
+      "nerve damage",
+      "partial numbness of lower lip (still about half numb)"
+    ],
+    "revision_needed": true,
+    "summary_en": "Author reports zygoma reduction and jaw reduction at 다인성형외과 last year costing 13,500,000 KRW, resulting in jaw asymmetry and persistent partial numbness of the lower lip from nerve damage, and is now consulting about revision surgery.",
+    "translation_en": "I had zygoma reduction and square jaw surgery at 다인성형외과 last year, but I developed jaw asymmetry, so I'm currently getting consultations for revision surgery. I paid 13,500,000 KRW for the surgery. I'm not going to bother writing the director's name. Due to nerve damage, my lower lip is still about half numb. The clinic only tells me it will come back with time.",
+    "trust": {
+      "score": 60,
+      "signals": [
+        "first_person",
+        "price_verified"
+      ]
+    },
+    "original_text": "다인성형외과에서 작년에 광대축소랑 사각턱 했는데 턱 비대칭이 생겨서 결국 재수술 상담 받는 중입니다. 수술비는 1,350만원 냈고요. 원장 이름은 굳이 안 쓸게요. 신경 손상으로 아랫입술 감각이 아직 반쯤 없어요. 병원 측은 시간이 지나면 돌아온다고만 하네요."
+  },
+  {
+    "id": "r01",
+    "sources": [
+      {
+        "id": "r01",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-02"
+      },
+      {
+        "id": "r02",
+        "source": "naver_blog",
+        "posted_at": "2026-03-05"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": "하늘빛성형외과",
+      "match": "exact"
+    },
+    "surgeon_mention": "김도윤",
+    "review_type": "procedure",
+    "procedures": [
+      "double_eyelid_incisional",
+      "ptosis_correction"
+    ],
+    "price": {
+      "krw": 2800000,
+      "verbatim": "부가세 포함 280만원",
+      "note": "VAT included. Initially quoted 320만원 (3,200,000 KRW) by the consultation manager; discounted for paying cash instead of card.",
+      "check": "verified"
+    },
+    "outcome": "positive",
+    "complications": [
+      "swelling lasting about 2 weeks"
+    ],
+    "revision_needed": false,
+    "summary_en": "First-person review of incisional double eyelid surgery with ptosis correction, paid 2,800,000 KRW including VAT after a cash discount from an initial 3.2 million quote, with about 2 weeks of swelling and a natural result at 3 months.",
+    "translation_en": "I had incisional double eyelid surgery together with ptosis correction (eye-shape correction) with Dr. Kim Do-yun at Haneulbit Plastic Surgery in Gangnam. The price was 2.8 million won including VAT — the consultation manager first quoted 3.2 million, but since I paid in cash instead of by card, they gave me a discount. The swelling lasted about 2 weeks, and I'm now 3 months post-op and the line came out nicely and naturally. Attaching before-and-after photos. I also verified/posted the receipt.",
+    "trust": {
+      "score": 100,
+      "signals": [
+        "first_person",
+        "proof",
+        "surgeon_named",
+        "price_verified",
+        "cross_posted"
+      ]
+    },
+    "original_text": "강남 하늘빛성형외과에서 김도윤 원장님께 쌍커풀 절개랑 눈매교정 같이 했어요. 가격은 부가세 포함 280만원이었고 상담실장님이 처음에 320 불렀는데 카드 말고 현금으로 하니까 깎아주셨어요. 붓기는 2주 정도 갔고 지금 3개월차인데 라인 자연스럽게 잘 나왔어요. 전후 사진 첨부합니다. 영수증도 인증했어요."
+  },
+  {
+    "id": "r10",
+    "sources": [
+      {
+        "id": "r10",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-08"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": "하늘빛성형",
+      "match": "exact"
+    },
+    "surgeon_mention": "김도윤 원장님",
+    "review_type": "procedure",
+    "procedures": [
+      "double_eyelid_non_incisional"
+    ],
+    "price": {
+      "krw": 1500000,
+      "verbatim": "150만원",
+      "note": null,
+      "check": "verified"
+    },
+    "outcome": "positive",
+    "complications": [],
+    "revision_needed": false,
+    "summary_en": "First-person account of non-incisional double eyelid surgery at 하늘빛성형 with 김도윤 원장님 for 1,500,000 KRW, with swelling largely resolved after one week and no photos shared.",
+    "translation_en": "I had non-incisional (buried suture) double eyelid surgery at Haneulbit Seonghyeong (하늘빛성형). Director Kim Do-yoon's consultation was thorough and the price was 1.5 million won. The swelling had mostly gone down within a week. I can't post before/after photos because they're for my own personal keeping, sad.",
+    "trust": {
+      "score": 75,
+      "signals": [
+        "first_person",
+        "surgeon_named",
+        "price_verified"
+      ]
+    },
+    "original_text": "하늘빛성형에서 쌍커풀 매몰로 했어요. 김도윤 원장님 상담 꼼꼼하시고 가격은 150만원. 1주일 만에 붓기 거의 빠졌어요. 전후사진은 개인 소장이라 못 올려요 ㅠ"
+  },
+  {
+    "id": "r03",
+    "sources": [
+      {
+        "id": "r03",
+        "source": "naver_blog",
+        "posted_at": "2026-03-11"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": "HB성형외과",
+      "match": "exact"
+    },
+    "surgeon_mention": null,
+    "review_type": "procedure",
+    "procedures": [
+      "rhinoplasty"
+    ],
+    "price": {
+      "krw": null,
+      "verbatim": null,
+      "note": null,
+      "check": "none"
+    },
+    "outcome": "positive",
+    "complications": [],
+    "revision_needed": false,
+    "summary_en": "A sponsored blog post about a rhinoplasty using silicone and ear cartilage at HB성형외과, reporting full satisfaction with no price or downsides given.",
+    "translation_en": "Hello~ Today I've brought a review of rhinoplasty at HB Plastic Surgery ✨ The director is so kind and the facilities are as clean as a hotel! I had it done with silicone + ear cartilage and I'm very satisfied with the result. If anyone is curious, please leave a comment~ This posting was written with the procedure cost supported by the clinic.",
+    "trust": {
+      "score": 0,
+      "signals": [
+        "first_person",
+        "sponsored",
+        "marketing_tone"
+      ]
+    },
+    "original_text": "안녕하세요~ 오늘은 HB성형외과 코성형 후기 들고 왔어요 ✨ 원장님이 너무 친절하시고 시설도 호텔같이 깔끔해요! 실리콘 + 귀연골로 했고 결과 대만족입니다. 궁금하신 분들은 댓글 남겨주세요~ 본 포스팅은 병원으로부터 시술비를 지원받아 작성되었습니다."
+  },
+  {
+    "id": "r08",
+    "sources": [
+      {
+        "id": "r08",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-14"
+      }
+    ],
+    "clinic": {
+      "id": null,
+      "name_en": null,
+      "mention": "압구정 새벽별의원",
+      "match": "unmatched"
+    },
+    "surgeon_mention": null,
+    "review_type": "procedure",
+    "procedures": [
+      "ulthera"
+    ],
+    "price": {
+      "krw": 1500000,
+      "verbatim": "150만원",
+      "note": "Price stated for 300 shots; no mention of VAT, discounts, or earlier quotes.",
+      "check": "verified"
+    },
+    "outcome": "negative",
+    "complications": [
+      "severe pain during the procedure"
+    ],
+    "revision_needed": false,
+    "summary_en": "Author paid 1,500,000 KRW for a 300-shot Ulthera treatment at 압구정 새벽별의원 and reports no discernible effect and considerable pain.",
+    "translation_en": "I got Ulthera, 300 shots, at Apgujeong Saebyeokbyeol Clinic and the price was 1.5 million won... Honestly, I can't really tell if it did anything. It just hurt like crazy.",
+    "trust": {
+      "score": 60,
+      "signals": [
+        "first_person",
+        "price_verified"
+      ]
+    },
+    "original_text": "압구정 새벽별의원에서 울쎄라 300샷 했는데 가격이 150만원... 효과는 솔직히 잘 모르겠어요. 아프기만 엄청 아팠음."
+  },
+  {
+    "id": "r05",
+    "sources": [
+      {
+        "id": "r05",
+        "source": "english_forum",
+        "posted_at": "2026-03-20"
+      }
+    ],
+    "clinic": {
+      "id": "dain",
+      "name_en": "Dain Plastic Surgery",
+      "mention": "Dain PS (Da-in)",
+      "match": "exact"
+    },
+    "surgeon_mention": "Dr. Park Seo-jin",
+    "review_type": "procedure",
+    "procedures": [
+      "rhinoplasty"
+    ],
+    "price": {
+      "krw": 9800000,
+      "verbatim": "9,800,000 won",
+      "note": "Author gives a USD equivalent of \"about $7,100 at the time\". No mention of VAT, discounts or packages.",
+      "check": "verified"
+    },
+    "outcome": "positive",
+    "complications": [
+      "residual swelling still present at 3 weeks post-op"
+    ],
+    "revision_needed": false,
+    "summary_en": "An English-speaking medical tourist reports paying 9,800,000 KRW for a rhinoplasty by Dr. Park Seo-jin at Dain PS, noting residual swelling at three weeks but a good result and helpful English coordination.",
+    "translation_en": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM.",
+    "trust": {
+      "score": 95,
+      "signals": [
+        "first_person",
+        "proof",
+        "surgeon_named",
+        "price_verified"
+      ]
+    },
+    "original_text": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM."
+  },
+  {
+    "id": "r09",
+    "sources": [
+      {
+        "id": "r09",
+        "source": "english_forum",
+        "posted_at": "2026-03-25"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": "Haneulbit Plastic Surgery",
+      "match": "exact"
+    },
+    "surgeon_mention": null,
+    "review_type": "consultation_only",
+    "procedures": [
+      "fat_grafting",
+      "eye_revision"
+    ],
+    "price": {
+      "krw": 12000000,
+      "verbatim": "12 million KRW",
+      "note": "Quote only, for fat grafting plus eye revision combined; author did not proceed. No VAT or discount details given.",
+      "check": "verified"
+    },
+    "outcome": "negative",
+    "complications": [],
+    "revision_needed": false,
+    "summary_en": "The author was quoted 12,000,000 KRW at Haneulbit Plastic Surgery for fat grafting and an eye revision, spent only 10 minutes with the surgeon versus 40 with a sales coordinator, and did not book the surgery.",
+    "translation_en": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end.",
+    "trust": {
+      "score": 60,
+      "signals": [
+        "first_person",
+        "price_verified"
+      ]
+    },
+    "original_text": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end."
+  }
+]

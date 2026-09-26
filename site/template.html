@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gangnam Review Normaliser</title>
+<meta name="description" content="Raw Korean clinic reviews in, de-duplicated structured English records out.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f7f6f3; --surface: #ffffff; --ink: #1c1b19; --muted: #6b6760; --line: #e6e3dc;
+  --accent: #b4235a; --accent-soft: #fbe8ef;
+  --good: #1f7a4d; --good-soft: #e3f3ea; --warn: #9a5b00; --warn-soft: #fbf0dc; --bad: #b42318; --bad-soft: #fde8e6;
+  --c-haneulbit: #b4235a; --c-dain: #2563a8; --c-seoul-miso: #1f7a4d; --c-none: #8a857c;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141312; --surface: #1d1c1a; --ink: #eeebe6; --muted: #a29d94; --line: #33312d;
+    --accent: #f06f9e; --accent-soft: #3a1d29;
+    --good: #5cc98f; --good-soft: #17301f; --warn: #e8a94a; --warn-soft: #33260f; --bad: #f47a6e; --bad-soft: #3a1a17;
+    --c-haneulbit: #f06f9e; --c-dain: #6ea8f0; --c-seoul-miso: #5cc98f; --c-none: #8a857c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141312; --surface: #1d1c1a; --ink: #eeebe6; --muted: #a29d94; --line: #33312d;
+  --accent: #f06f9e; --accent-soft: #3a1d29;
+  --good: #5cc98f; --good-soft: #17301f; --warn: #e8a94a; --warn-soft: #33260f; --bad: #f47a6e; --bad-soft: #3a1a17;
+  --c-haneulbit: #f06f9e; --c-dain: #6ea8f0; --c-seoul-miso: #5cc98f; --c-none: #8a857c;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, "Noto Sans KR", system-ui, sans-serif; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px 64px; }
+header { padding-block: 40px 8px; text-align: center; }
+h1 { font-size: clamp(1.5rem, 3.5vw, 2.1rem); margin: 0 0 6px; letter-spacing: -0.02em; }
+.lede { color: var(--muted); margin: 0 auto; max-width: 620px; }
+.switch-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; justify-content: center; padding: 14px 0; background: var(--bg); }
+.switch { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px; gap: 2px; box-shadow: 0 1px 2px rgb(0 0 0 / 0.04); }
+.switch button { border: 0; background: transparent; color: var(--muted); font: inherit; font-weight: 600; font-size: 0.9rem; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; color: var(--muted); font-size: 0.88rem; margin: 4px 0 22px; }
+.stats b { color: var(--ink); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.card.dupe { border-style: dashed; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 0.78rem; color: var(--muted); }
+.tag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font-size: 0.76rem; font-weight: 500; color: var(--muted); }
+.tag.good { background: var(--good-soft); color: var(--good); border-color: transparent; }
+.tag.warn { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.tag.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.tag.accent { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.raw-text { font-family: "Noto Sans KR", Inter, sans-serif; font-size: 0.92rem; }
+.clinic { font-weight: 700; font-size: 1.02rem; display: flex; align-items: center; gap: 8px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.summary { margin: 0; }
+.row { display: flex; justify-content: space-between; gap: 12px; font-size: 0.86rem; border-top: 1px solid var(--line); padding-top: 8px; }
+.row span:first-child { color: var(--muted); }
+.row span:last-child { text-align: right; }
+.trust { display: flex; align-items: center; gap: 10px; font-size: 0.86rem; }
+.bar { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; }
+details { font-size: 0.86rem; color: var(--muted); }
+details summary { cursor: pointer; }
+details p { margin: 6px 0 0; }
+.map-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+.map-scroll { overflow-x: auto; }
+svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.84rem; color: var(--muted); margin-top: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.tip { min-height: 4.5em; margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: var(--bg); font-size: 0.88rem; }
+.pairs { margin-top: 16px; font-size: 0.86rem; }
+.pairs table { width: 100%; border-collapse: collapse; }
+.pairs td, .pairs th { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.pairs th { color: var(--muted); font-weight: 500; }
+.note { color: var(--muted); font-size: 0.86rem; max-width: 720px; margin: 14px auto 0; text-align: center; }
+footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 40px; }
+footer a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Gangnam Review Normaliser</h1>
+    <p class="lede">Korean clinic reviews from cafes, blogs and forums go in. One de-duplicated, translated, trust-scored record per real experience comes out.</p>
+  </header>
+
+  <div class="switch-bar">
+    <div class="switch" role="group" aria-label="View">
+      <button data-view="before" aria-pressed="true">Before</button>
+      <button data-view="after" aria-pressed="false">After</button>
+      <button data-view="map" aria-pressed="false">Embeddings</button>
+    </div>
+  </div>
+
+  <main>
+    <section id="before"></section>
+    <section id="after" hidden></section>
+    <section id="map" hidden></section>
+  </main>
+
+  <footer>Synthetic sample data; all clinic and surgeon names are fictional. <a href="https://github.com/ZaidBinArif/wetheflywheel_1">Source on GitHub</a></footer>
+</div>
+
+<script>
+const DATA = __DATA__;
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const krw = n => n == null ? "—" : "₩" + n.toLocaleString("en-US");
+const SOURCE = { naver_cafe: "Naver Cafe", naver_blog: "Naver Blog", daum_cafe: "Daum Cafe", english_forum: "English forum" };
+const clinicColor = id => `var(--c-${id || "none"})`;
+const clinicName = id => DATA.clinics[id]?.name_en || "Unmatched clinic";
+
+// raw id -> the normalised record it ended up in
+const recordOf = {};
+DATA.records.forEach(r => r.sources.forEach(s => (recordOf[s.id] = r)));
+
+function renderBefore() {
+  const sources = new Set(DATA.raw.map(r => r.source));
+  const el = document.getElementById("before");
+  el.innerHTML = `
+    <div class="stats"><span><b>${DATA.raw.length}</b> posts</span><span><b>${sources.size}</b> sources</span><span>Mostly Korean, prices in 만원, clinic names spelled many ways</span></div>
+    <div class="grid">${DATA.raw.map(r => `
+      <article class="card">
+        <div class="meta"><span class="tag">${SOURCE[r.source] || r.source}</span><span>${r.posted_at}</span><span>#${r.id}</span></div>
+        <div class="raw-text">${esc(r.text)}</div>
+      </article>`).join("")}
+    </div>`;
+}
+
+function trustColor(score) { return score >= 60 ? "var(--good)" : score >= 35 ? "var(--warn)" : "var(--bad)"; }
+const OUTCOME = { positive: "good", mixed: "warn", negative: "bad", unknown: "" };
+const PRICE_CHECK = { verified: ["good", "price verified"], mismatch: ["bad", "price mismatch"], unverified: ["warn", "price unverified"] };
+
+function renderAfter() {
+  const recs = [...DATA.records].sort((a, b) => b.trust.score - a.trust.score);
+  const merged = DATA.raw.length - DATA.records.length;
+  const unmatched = recs.filter(r => !r.clinic.id).length;
+  const sponsored = recs.filter(r => r.trust.signals.includes("sponsored")).length;
+  const el = document.getElementById("after");
+  el.innerHTML = `
+    <div class="stats"><span><b>${recs.length}</b> unique reviews</span><span><b>${merged}</b> duplicate merged</span><span><b>${Object.keys(DATA.clinics).length}</b> clinics resolved</span><span><b>${unmatched}</b> needs review</span><span><b>${sponsored}</b> sponsored flagged</span></div>
+    <div class="grid">${recs.map(r => {
+      const pc = PRICE_CHECK[r.price.check];
+      return `
+      <article class="card">
+        <div class="clinic"><span class="dot" style="background:${clinicColor(r.clinic.id)}"></span>${esc(clinicName(r.clinic.id))}</div>
+        <div class="meta">
+          ${r.clinic.mention ? `<span>written as “${esc(r.clinic.mention)}” · ${esc(r.clinic.match)}</span>` : ""}
+        </div>
+        <div class="meta">
+          ${r.review_type === "consultation_only" ? `<span class="tag warn">quote only</span>` : ""}
+          ${r.outcome ? `<span class="tag ${OUTCOME[r.outcome]}">${r.outcome}</span>` : ""}
+          ${r.trust.signals.includes("sponsored") ? `<span class="tag bad">sponsored</span>` : ""}
+          ${r.trust.signals.includes("marketing_tone") ? `<span class="tag bad">marketing tone</span>` : ""}
+          ${r.revision_needed ? `<span class="tag bad">revision needed</span>` : ""}
+          ${r.sources.length > 1 ? `<span class="tag accent">merged ${r.sources.length} posts</span>` : ""}
+        </div>
+        <p class="summary">${esc(r.summary_en)}</p>
+        <div class="row"><span>Procedures</span><span>${r.procedures.map(p => p.replaceAll("_", " ")).join(", ") || "—"}</span></div>
+        <div class="row"><span>Surgeon</span><span>${esc(r.surgeon_mention) || "not named"}</span></div>
+        <div class="row"><span>Price</span><span>${krw(r.price.krw)} ${pc ? `<span class="tag ${pc[0]}">${pc[1]}</span>` : ""}</span></div>
+        ${r.price.note ? `<div class="row"><span>Price note</span><span>${esc(r.price.note)}</span></div>` : ""}
+        ${r.complications.length ? `<div class="row"><span>Complications</span><span>${r.complications.map(esc).join("; ")}</span></div>` : ""}
+        <div class="row"><span>Sources</span><span>${r.sources.map(s => `${SOURCE[s.source] || s.source} #${s.id}`).join(" + ")}</span></div>
+        <div class="trust"><span>Trust</span><div class="bar"><i style="width:${r.trust.score}%;background:${trustColor(r.trust.score)}"></i></div><b>${r.trust.score}</b></div>
+        <details><summary>English translation</summary><p>${esc(r.translation_en)}</p></details>
+      </article>`;
+    }).join("")}
+    </div>`;
+}
+
+function renderMap() {
+  const el = document.getElementById("map");
+  const pts = DATA.embeddings.points;
+  const W = 760, H = 460, P = 48;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const sx = v => P + (v - Math.min(...xs)) / (Math.max(...xs) - Math.min(...xs)) * (W - 2 * P);
+  const sy = v => H - P - (v - Math.min(...ys)) / (Math.max(...ys) - Math.min(...ys)) * (H - 2 * P);
+  const pos = Object.fromEntries(pts.map(p => [p.id, [sx(p.x), sy(p.y)]]));
+  const raw = Object.fromEntries(DATA.raw.map(r => [r.id, r]));
+
+  const dupeLines = DATA.records.filter(r => r.sources.length > 1).flatMap(r =>
+    r.sources.slice(1).map(s => [r.sources[0].id, s.id]));
+
+  el.innerHTML = `
+    <div class="stats"><span><b>${pts.length}</b> raw posts embedded</span><span>Model: <b>${esc(DATA.embeddings.model)}</b> (multilingual, runs locally)</span><span>2D by PCA</span></div>
+    <div class="map-card">
+      <div class="map-scroll">
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="2D map of review embeddings">
+        ${dupeLines.map(([a, b]) => `<line x1="${pos[a][0]}" y1="${pos[a][1]}" x2="${pos[b][0]}" y2="${pos[b][1]}" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/>`).join("")}
+        ${pts.map(p => {
+          const rec = recordOf[p.id];
+          const [x, y] = pos[p.id];
+          return `<g class="pt" data-id="${p.id}" tabindex="0" style="cursor:pointer">
+            <circle cx="${x}" cy="${y}" r="11" fill="${clinicColor(rec?.clinic.id)}" fill-opacity="0.85" stroke="var(--surface)" stroke-width="2"/>
+            <text x="${x + 15}" y="${y + 4}" font-size="12" fill="var(--ink)">${p.id}</text>
+          </g>`;
+        }).join("")}
+      </svg>
+      </div>
+      <div class="legend">
+        ${Object.keys(DATA.clinics).map(id => `<span><i class="dot" style="background:${clinicColor(id)}"></i>${esc(clinicName(id))}</span>`).join("")}
+        <span><i class="dot" style="background:var(--c-none)"></i>Unmatched</span>
+        <span><svg width="26" height="8" style="min-width:0"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4"/></svg>Merged as duplicate</span>
+      </div>
+      <div class="tip" id="tip">Hover or tap a point to read the post.</div>
+    </div>
+    <div class="pairs map-card" style="margin-top:14px">
+      <b>Closest pairs by cosine similarity</b>
+      <table><thead><tr><th>Pair</th><th>Cosine</th><th>Same record after dedupe?</th></tr></thead><tbody>
+      ${DATA.embeddings.pairs.slice(0, 6).map(p => {
+        const same = recordOf[p.a] === recordOf[p.b];
+        return `<tr><td>#${p.a} · #${p.b}</td><td>${p.cosine.toFixed(3)}</td><td>${same ? '<span class="tag accent">yes, duplicate</span>' : '<span class="tag">no, different people</span>'}</td></tr>`;
+      }).join("")}
+      </tbody></table>
+    </div>
+    <p class="note">Embeddings put posts about the same clinic and procedure near each other, which includes different people with similar experiences. That's why the actual merge uses exact text overlap and the map is only for exploring.</p>`;
+
+  const tip = el.querySelector("#tip");
+  el.querySelectorAll(".pt").forEach(g => {
+    const show = () => {
+      const r = raw[g.dataset.id], rec = recordOf[g.dataset.id];
+      tip.innerHTML = `<b>#${r.id}</b> · ${SOURCE[r.source] || r.source} · ${esc(clinicName(rec?.clinic.id))}<br><span class="raw-text">${esc(r.text)}</span>`;
+    };
+    g.addEventListener("mouseenter", show);
+    g.addEventListener("focus", show);
+    g.addEventListener("click", show);
+  });
+}
+
+renderBefore(); renderAfter();
+if (DATA.embeddings) renderMap();
+else document.querySelector('[data-view="map"]').hidden = true;
+
+const buttons = document.querySelectorAll(".switch button");
+function setView(view) {
+  buttons.forEach(b => b.setAttribute("aria-pressed", b.dataset.view === view));
+  ["before", "after", "map"].forEach(v => (document.getElementById(v).hidden = v !== view));
+  history.replaceState(null, "", "#" + view);
+}
+buttons.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+if (["before", "after", "map"].includes(location.hash.slice(1))) setView(location.hash.slice(1));
+</script>
+</body>
+</html>
