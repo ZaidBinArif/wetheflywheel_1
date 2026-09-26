@@ -1,0 +1,20 @@
+[
+  {
+    "id": "haneulbit",
+    "name_ko": "하늘빛성형외과",
+    "name_en": "Haneulbit Plastic Surgery",
+    "aliases": ["하늘빛", "하늘빛성형", "HB성형외과", "Haneulbit", "Haneul-bit PS"]
+  },
+  {
+    "id": "dain",
+    "name_ko": "다인성형외과",
+    "name_en": "Dain Plastic Surgery",
+    "aliases": ["다인", "다인성형", "Dain PS", "Da-in", "DAIN"]
+  },
+  {
+    "id": "seoul-miso",
+    "name_ko": "서울미소의원",
+    "name_en": "Seoul Miso Clinic",
+    "aliases": ["서울미소", "미소의원", "Miso Clinic"]
+  }
+]

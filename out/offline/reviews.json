@@ -1,0 +1,326 @@
+[
+  {
+    "id": "r06",
+    "sources": [
+      {
+        "id": "r06",
+        "source": "naver_cafe",
+        "posted_at": "2026-01-29"
+      }
+    ],
+    "clinic": {
+      "id": "seoul-miso",
+      "name_en": "Seoul Miso Clinic",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 490000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "서울미소의원에서 레이저토닝 10회 패키지 49만원에 끊었어요. 기미가 확실히 옅어졌는데 5회차부터 효과 보였어요. 원장님은 매번 바뀌어서 누군지 모르겠어요. 부작용은 없었어요."
+  },
+  {
+    "id": "r07",
+    "sources": [
+      {
+        "id": "r07",
+        "source": "daum_cafe",
+        "posted_at": "2026-02-07"
+      }
+    ],
+    "clinic": {
+      "id": "seoul-miso",
+      "name_en": "Seoul Miso Clinic",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 50000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "미소의원 사각턱 보톡스 국산으로 5만원 이벤트 했어요 ㅋㅋ 싸서 반신반의했는데 한 달 지나니까 턱라인 정리됐어요. 대기가 1시간 넘게 걸린 건 별로."
+  },
+  {
+    "id": "r04",
+    "sources": [
+      {
+        "id": "r04",
+        "source": "daum_cafe",
+        "posted_at": "2026-02-18"
+      }
+    ],
+    "clinic": {
+      "id": "dain",
+      "name_en": "Dain Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 13500000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "다인성형외과에서 작년에 광대축소랑 사각턱 했는데 턱 비대칭이 생겨서 결국 재수술 상담 받는 중입니다. 수술비는 1,350만원 냈고요. 원장 이름은 굳이 안 쓸게요. 신경 손상으로 아랫입술 감각이 아직 반쯤 없어요. 병원 측은 시간이 지나면 돌아온다고만 하네요."
+  },
+  {
+    "id": "r01",
+    "sources": [
+      {
+        "id": "r01",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-02"
+      },
+      {
+        "id": "r02",
+        "source": "naver_blog",
+        "posted_at": "2026-03-05"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 2800000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 25,
+      "signals": [
+        "cross_posted"
+      ]
+    },
+    "original_text": "강남 하늘빛성형외과에서 김도윤 원장님께 쌍커풀 절개랑 눈매교정 같이 했어요. 가격은 부가세 포함 280만원이었고 상담실장님이 처음에 320 불렀는데 카드 말고 현금으로 하니까 깎아주셨어요. 붓기는 2주 정도 갔고 지금 3개월차인데 라인 자연스럽게 잘 나왔어요. 전후 사진 첨부합니다. 영수증도 인증했어요."
+  },
+  {
+    "id": "r10",
+    "sources": [
+      {
+        "id": "r10",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-08"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 1500000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "하늘빛성형에서 쌍커풀 매몰로 했어요. 김도윤 원장님 상담 꼼꼼하시고 가격은 150만원. 1주일 만에 붓기 거의 빠졌어요. 전후사진은 개인 소장이라 못 올려요 ㅠ"
+  },
+  {
+    "id": "r03",
+    "sources": [
+      {
+        "id": "r03",
+        "source": "naver_blog",
+        "posted_at": "2026-03-11"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": null,
+      "verbatim": null,
+      "note": null,
+      "check": "none"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 0,
+      "signals": [
+        "sponsored"
+      ]
+    },
+    "original_text": "안녕하세요~ 오늘은 HB성형외과 코성형 후기 들고 왔어요 ✨ 원장님이 너무 친절하시고 시설도 호텔같이 깔끔해요! 실리콘 + 귀연골로 했고 결과 대만족입니다. 궁금하신 분들은 댓글 남겨주세요~ 본 포스팅은 병원으로부터 시술비를 지원받아 작성되었습니다."
+  },
+  {
+    "id": "r08",
+    "sources": [
+      {
+        "id": "r08",
+        "source": "naver_cafe",
+        "posted_at": "2026-03-14"
+      }
+    ],
+    "clinic": {
+      "id": null,
+      "name_en": null,
+      "mention": null,
+      "match": "unmatched"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 1500000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "압구정 새벽별의원에서 울쎄라 300샷 했는데 가격이 150만원... 효과는 솔직히 잘 모르겠어요. 아프기만 엄청 아팠음."
+  },
+  {
+    "id": "r05",
+    "sources": [
+      {
+        "id": "r05",
+        "source": "english_forum",
+        "posted_at": "2026-03-20"
+      }
+    ],
+    "clinic": {
+      "id": "dain",
+      "name_en": "Dain Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 9800000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "Just got back from Seoul. Had my rhinoplasty at Dain PS (Da-in) with Dr. Park Seo-jin. Paid 9,800,000 won, about $7,100 at the time. They had an English coordinator which honestly made the whole thing. Swelling still there at week 3 but shape looks great. Happy to share before/afters by DM."
+  },
+  {
+    "id": "r09",
+    "sources": [
+      {
+        "id": "r09",
+        "source": "english_forum",
+        "posted_at": "2026-03-25"
+      }
+    ],
+    "clinic": {
+      "id": "haneulbit",
+      "name_en": "Haneulbit Plastic Surgery",
+      "mention": null,
+      "match": "text_scan"
+    },
+    "surgeon_mention": null,
+    "review_type": null,
+    "procedures": [],
+    "price": {
+      "krw": 12000000,
+      "verbatim": null,
+      "note": null,
+      "check": "regex_only"
+    },
+    "outcome": null,
+    "complications": [],
+    "revision_needed": null,
+    "summary_en": null,
+    "translation_en": null,
+    "trust": {
+      "score": 20,
+      "signals": []
+    },
+    "original_text": "Haneulbit Plastic Surgery quoted me 12 million KRW for fat grafting plus an eye revision. Consultation was only 10 minutes with the surgeon and 40 with the sales coordinator. I didn't book there in the end."
+  }
+]
